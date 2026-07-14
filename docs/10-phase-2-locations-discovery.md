@@ -15,7 +15,7 @@ best times to visit, travel tips, and passport-aware visa notes). The BDD suite 
 | API (integrations) | [src/CycleSync.Api/Integrations](../src/CycleSync.Api/Integrations) | `IMapsSearch` (Azure Maps) and `ILocationIntelligenceGenerator` abstractions + implementations |
 | Web (SPA) | [src/web/src](../src/web/src) | React screens wired via RTK Query: sign-in, search/persist, and the intelligence detail |
 | E2E | [tests/e2e](../tests/e2e) | Playwright full-stack spec (runs in CI) |
-| CI | [ci/ci.yml](../ci/ci.yml) | Acceptance, web unit, SQL-Server fidelity, and Playwright jobs |
+| CI | [.github/workflows/ci.yml](../.github/workflows/ci.yml) | Acceptance, web unit, SQL-Server fidelity, and Playwright jobs |
 
 ## Green scenarios (19 total)
 
@@ -112,9 +112,8 @@ covered headlessly. Run them with `npm test` in `src/web`.
 
 ## End-to-end & CI
 
-A [GitHub Actions workflow](../ci/ci.yml) runs four jobs; none needs
-Docker-in-Docker — GitHub's runners provide Docker at the host level (see
-[ci/README.md](../ci/README.md) for how to install it under `.github/workflows/`):
+A [GitHub Actions workflow](../.github/workflows/ci.yml) runs four jobs; none needs
+Docker-in-Docker — GitHub's runners provide Docker at the host level:
 
 1. **dotnet-acceptance** — the Reqnroll BDD suite (SQLite, offline).
 2. **web-unit** — SPA lint, Vitest, and production build.

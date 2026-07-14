@@ -1,0 +1,15 @@
+<Project>
+
+  <!--
+    Shared build settings for all .NET projects. TargetFramework is set per-project so the
+    JavaScript (.esproj) frontend under src/web is unaffected.
+  -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+  </PropertyGroup>
+
+</Project>

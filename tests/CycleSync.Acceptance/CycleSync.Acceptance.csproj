@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!-- Keep Reqnroll-generated code-behind for linked feature files under obj/. -->
+    <ReqnrollUseIntermediateOutputPathForCodeBehind>true</ReqnrollUseIntermediateOutputPathForCodeBehind>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Reqnroll.xUnit" />
+    <PackageReference Include="Reqnroll.Tools.MsBuild.Generation" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CycleSync.Api\CycleSync.Api.csproj" />
+    <ProjectReference Include="..\..\src\CycleSync.Domain\CycleSync.Domain.csproj" />
+    <ProjectReference Include="..\..\src\CycleSync.Infrastructure\CycleSync.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <!--
+    The canonical Gherkin specs live in tests/features/ so they are a single source of truth
+    for documentation and tests. Link them into this project for Reqnroll code generation.
+  -->
+  <ItemGroup>
+    <ReqnrollFeatureFile Include="..\features\smoke.feature" Link="Features\smoke.feature" />
+    <ReqnrollFeatureFile Include="..\features\authentication.feature" Link="Features\authentication.feature" />
+    <ReqnrollFeatureFile Include="..\features\user-profile.feature" Link="Features\user-profile.feature" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

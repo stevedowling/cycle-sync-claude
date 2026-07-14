@@ -1,0 +1,150 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# All jobs run on GitHub-hosted runners, which provide Docker at the host level. The SQL Server
+# service containers and the Playwright browsers below use that host Docker — this is not
+# Docker-in-Docker and needs no special privileges.
+jobs:
+  # BDD acceptance suite: the real API against in-memory SQLite with offline doubles. Fast, hermetic.
+  dotnet-acceptance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet tool restore
+      - run: dotnet test tests/CycleSync.Acceptance/CycleSync.Acceptance.csproj --configuration Release
+
+  # SPA unit/component tests (jsdom), lint, and production build.
+  web-unit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: src/web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  # Fidelity check: apply the EF migrations against a real SQL Server, catching anything that only
+  # works on SQLite (filtered indexes, collation, datetimeoffset, tinyint).
+  sql-integration:
+    runs-on: ubuntu-latest
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          MSSQL_SA_PASSWORD: "Your_password123"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Your_password123 -No -Q 'SELECT 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet tool restore
+      - name: Apply migrations to SQL Server
+        run: >-
+          dotnet ef database update
+          --project src/CycleSync.Infrastructure/CycleSync.Infrastructure.csproj
+          --startup-project src/CycleSync.Infrastructure/CycleSync.Infrastructure.csproj
+          --context CycleSyncDbContext
+          --connection "Server=localhost,1433;Database=cyclesync;User Id=sa;Password=Your_password123;TrustServerCertificate=True"
+
+  # Full-stack browser E2E: React SPA → API → real SQL Server, driven by Playwright. The API runs in
+  # the hermetic E2E environment (offline auth + offline maps) and serves the built SPA same-origin.
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          MSSQL_SA_PASSWORD: "Your_password123"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Your_password123 -No -Q 'SELECT 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      ConnectionStrings__cyclesync: "Server=localhost,1433;Database=cyclesync;User Id=sa;Password=Your_password123;TrustServerCertificate=True"
+      Auth__Jwt__SigningKey: "e2e-only-signing-key-0123456789abcdef0123456789"
+      ASPNETCORE_ENVIRONMENT: E2E
+      ASPNETCORE_URLS: http://localhost:5000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build SPA
+        working-directory: src/web
+        run: |
+          npm ci
+          npm run build
+
+      - name: Stage SPA into the API's wwwroot (served same-origin)
+        run: |
+          mkdir -p src/CycleSync.Api/wwwroot
+          cp -r src/web/dist/* src/CycleSync.Api/wwwroot/
+
+      - name: Start the API (E2E environment)
+        run: |
+          # nohup + disown so the server survives this step and stays up for the Playwright step.
+          nohup dotnet run --project src/CycleSync.Api/CycleSync.Api.csproj --no-launch-profile \
+            > api.log 2>&1 &
+          disown || true
+          echo "Waiting for the API to become healthy…"
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:5000/health > /dev/null; then
+              echo "API is up."; exit 0
+            fi
+            sleep 2
+          done
+          echo "API did not become healthy in time. Recent log:" >&2
+          tail -n 100 api.log >&2 || true
+          exit 1
+
+      - name: Install Playwright browsers
+        working-directory: tests/e2e
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Run Playwright E2E
+        working-directory: tests/e2e
+        env:
+          E2E_BASE_URL: http://localhost:5000
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: tests/e2e/playwright-report
+          retention-days: 7

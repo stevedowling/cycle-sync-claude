@@ -5,6 +5,9 @@ using CycleSync.Api.Features.Profile;
 using CycleSync.Api.Features.Users;
 using CycleSync.Api.Integrations;
 using CycleSync.Infrastructure;
+using CycleSync.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +23,26 @@ builder.Services.AddCycleSyncDatabase(builder.Configuration);
 builder.Services.AddCycleSyncAuth(builder.Configuration);
 builder.Services.AddCycleSyncIntegrations(builder.Configuration);
 
+// Hermetic end-to-end mode (Playwright): swap Google validation for an offline stand-in so tests
+// can sign in without contacting Google. Never active in Development or Production. The database
+// stays real SQL Server (supplied by the CI service container).
+if (builder.Environment.IsEnvironment("E2E"))
+{
+    builder.Services.RemoveAll<IGoogleTokenValidator>();
+    builder.Services.AddSingleton<IGoogleTokenValidator, OfflineGoogleTokenValidator>();
+
+    builder.Services.RemoveAll<CycleSync.Api.Integrations.Maps.IMapsSearch>();
+    builder.Services.AddSingleton<CycleSync.Api.Integrations.Maps.IMapsSearch, CycleSync.Api.Integrations.Maps.OfflineMapsSearch>();
+}
+
 var app = builder.Build();
+
+// In E2E mode the API owns schema creation (no separate migration service in the pipeline).
+if (app.Environment.IsEnvironment("E2E"))
+{
+    using var scope = app.Services.CreateScope();
+    scope.ServiceProvider.GetRequiredService<CycleSyncDbContext>().Database.Migrate();
+}
 
 app.UseExceptionHandler();
 

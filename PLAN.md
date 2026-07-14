@@ -85,7 +85,10 @@ are green in CI and the slice is reachable in the running Aspire app.
 - Azure Maps-backed location search (proxied server-side behind `IMapsSearch`).
 - Location persistence (permanent, de-duplicated); AI-generated intelligence with timestamp +
   confidence, cached and regenerated when stale; passport-aware visa guidance.
-- Reqnroll suite green (19/19). **Details:** [docs/10-phase-2-locations-discovery.md](docs/10-phase-2-locations-discovery.md)
+- React SPA screens (sign-in, search/persist, intelligence detail) wired via RTK Query, with
+  Vitest + Testing Library component tests.
+- Reqnroll suite green (19/19); Playwright full-stack E2E and a real-SQL-Server fidelity pass run in
+  GitHub Actions CI. **Details:** [docs/10-phase-2-locations-discovery.md](docs/10-phase-2-locations-discovery.md)
 - **Features:** `location-search.feature`, `location-intelligence.feature`
 
 ### Phase 3 — Interest tracking

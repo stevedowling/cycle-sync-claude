@@ -13,6 +13,9 @@ best times to visit, travel tips, and passport-aware visa notes). The BDD suite 
 | Infrastructure | [src/CycleSync.Infrastructure](../src/CycleSync.Infrastructure) | EF config for both entities, `AddLocations` migration |
 | API (features) | [src/CycleSync.Api/Features/Locations](../src/CycleSync.Api/Features/Locations) | Search, persist, list, detail, intelligence endpoints + contracts |
 | API (integrations) | [src/CycleSync.Api/Integrations](../src/CycleSync.Api/Integrations) | `IMapsSearch` (Azure Maps) and `ILocationIntelligenceGenerator` abstractions + implementations |
+| Web (SPA) | [src/web/src](../src/web/src) | React screens wired via RTK Query: sign-in, search/persist, and the intelligence detail |
+| E2E | [tests/e2e](../tests/e2e) | Playwright full-stack spec (runs in CI) |
+| CI | [ci/ci.yml](../ci/ci.yml) | Acceptance, web unit, SQL-Server fidelity, and Playwright jobs |
 
 ## Green scenarios (19 total)
 
@@ -90,11 +93,45 @@ deterministic doubles swapped in by
 The real intelligence generator (heuristic) is exercised directly — only the external SQL Server,
 Google, and Azure Maps are substituted.
 
-## Deferred (consistent with Phase 1)
+## Frontend (SPA)
 
-The React locations/intelligence screen and Playwright UI coverage remain deferred; the Phase 2 BDD
-suite is API-level. Wiring the SPA screens via RTK Query and adding Playwright scenarios is tracked
-for a later hardening pass (Phase 5).
+The React app now has real screens wired via **RTK Query** ([src/web/src/features/api/apiSlice.ts](../src/web/src/features/api/apiSlice.ts)):
+
+- **Sign-in** — a dev email sign-in that posts to `/api/auth/google`; the session token is stored in
+  the `auth` slice and attached as a bearer on every request. In production the Google OIDC button
+  replaces the form; the token flows through the same slice.
+- **Locations** ([LocationsPage.tsx](../src/web/src/features/locations/LocationsPage.tsx)) — search
+  destinations, add a result (persist), and browse the saved list, each with loading states.
+- **Intelligence detail** ([LocationDetailPage.tsx](../src/web/src/features/locations/LocationDetailPage.tsx))
+  — climate, best times, tips, and visa guidance, with the **confidence badge and generation
+  timestamp always shown** (transparency principle).
+
+Component tests run under **Vitest + Testing Library** in jsdom (no browser, no Docker): a fetch
+stand-in drives RTK Query so the search→persist flow, the intelligence panel, and the auth gate are
+covered headlessly. Run them with `npm test` in `src/web`.
+
+## End-to-end & CI
+
+A [GitHub Actions workflow](../ci/ci.yml) runs four jobs; none needs
+Docker-in-Docker — GitHub's runners provide Docker at the host level (see
+[ci/README.md](../ci/README.md) for how to install it under `.github/workflows/`):
+
+1. **dotnet-acceptance** — the Reqnroll BDD suite (SQLite, offline).
+2. **web-unit** — SPA lint, Vitest, and production build.
+3. **sql-integration** — applies the EF migrations against a **real SQL Server** service container,
+   catching anything that only works on SQLite (filtered indexes, collation, `datetimeoffset`,
+   `tinyint`).
+4. **e2e** — a **Playwright** spec drives the full stack (React → API → SQL Server) in a browser.
+
+The E2E stack is hermetic: the API runs in a dedicated `E2E` environment
+([Program.cs](../src/CycleSync.Api/Program.cs)) that swaps in an offline Google validator and an
+offline maps gazetteer and serves the built SPA same-origin, so Playwright can sign in, search,
+persist, and read intelligence without Google or Azure keys. These doubles are **only** active in
+the `E2E` environment — never in Development or Production.
+
+To run the E2E stack locally: build the SPA into `src/CycleSync.Api/wwwroot`, start the API with
+`ASPNETCORE_ENVIRONMENT=E2E`, a SQL Server connection string, and `Auth__Jwt__SigningKey` set, then
+`npx playwright test` from `tests/e2e` with `E2E_BASE_URL` pointing at it.
 
 ## Next: Phase 3
 

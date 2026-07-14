@@ -2,6 +2,9 @@
   <Folder Name="/src/">
     <Project Path="src/CycleSync.Api/CycleSync.Api.csproj" />
     <Project Path="src/CycleSync.AppHost/CycleSync.AppHost.csproj" />
+    <Project Path="src/CycleSync.Domain/CycleSync.Domain.csproj" />
+    <Project Path="src/CycleSync.Infrastructure/CycleSync.Infrastructure.csproj" />
+    <Project Path="src/CycleSync.MigrationService/CycleSync.MigrationService.csproj" />
     <Project Path="src/CycleSync.ServiceDefaults/CycleSync.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/tests/">

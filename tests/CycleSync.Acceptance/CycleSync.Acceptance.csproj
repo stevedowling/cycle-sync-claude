@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="Reqnroll.xUnit" />
     <PackageReference Include="Reqnroll.Tools.MsBuild.Generation" />
@@ -20,6 +22,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\CycleSync.Api\CycleSync.Api.csproj" />
+    <ProjectReference Include="..\..\src\CycleSync.Domain\CycleSync.Domain.csproj" />
+    <ProjectReference Include="..\..\src\CycleSync.Infrastructure\CycleSync.Infrastructure.csproj" />
   </ItemGroup>
 
   <!--
@@ -28,6 +32,8 @@
   -->
   <ItemGroup>
     <ReqnrollFeatureFile Include="..\features\smoke.feature" Link="Features\smoke.feature" />
+    <ReqnrollFeatureFile Include="..\features\authentication.feature" Link="Features\authentication.feature" />
+    <ReqnrollFeatureFile Include="..\features\user-profile.feature" Link="Features\user-profile.feature" />
   </ItemGroup>
 
   <ItemGroup>

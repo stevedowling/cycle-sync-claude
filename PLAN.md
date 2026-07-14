@@ -22,6 +22,7 @@ implement until it passes.
 | [docs/06-bdd-strategy.md](docs/06-bdd-strategy.md) | Test pyramid, Reqnroll + Playwright, CI gates |
 | [docs/07-solution-structure.md](docs/07-solution-structure.md) | Projects, folders, naming, tooling |
 | [docs/08-phase-0-walking-skeleton.md](docs/08-phase-0-walking-skeleton.md) | Phase 0 (built): what exists, how to run, limitations |
+| [docs/09-phase-1-auth-profiles.md](docs/09-phase-1-auth-profiles.md) | Phase 1 (built): auth, profiles, persistence, testing approach |
 | [tests/features/](tests/features/) | Executable Gherkin feature files (the BDD specs) |
 
 ## Guiding principles (from the brief)
@@ -71,10 +72,12 @@ are green in CI and the slice is reachable in the running Aspire app.
 - Reqnroll harness runs `smoke.feature` green (2/2). Playwright wiring deferred to Phase 1.
 - **Features:** `smoke.feature` · **Details:** [docs/08-phase-0-walking-skeleton.md](docs/08-phase-0-walking-skeleton.md)
 
-### Phase 1 — Authentication & profiles
-- Google OAuth (OIDC) login, domain restriction enforced server-side.
-- Session/JWT issuance; unauthenticated calls rejected.
+### Phase 1 — Authentication & profiles ✅ built
+- Google sign-in with domain restriction enforced server-side; provisioning on first sign-in.
+- Application session JWT issuance; unauthenticated calls rejected (`401`).
 - User profile CRUD: home location, currency, language, passports.
+- EF Core + SQL Server, `InitialCreate` migration, `CycleSync.MigrationService`.
+- Reqnroll suite green (11/11). **Details:** [docs/09-phase-1-auth-profiles.md](docs/09-phase-1-auth-profiles.md)
 - **Features:** `authentication.feature`, `user-profile.feature`
 
 ### Phase 2 — Locations & discovery

@@ -1,3 +1,10 @@
+using CycleSync.Api.Auth;
+using CycleSync.Api.Features.Auth;
+using CycleSync.Api.Features.Locations;
+using CycleSync.Api.Features.Profile;
+using CycleSync.Api.Features.Users;
+using CycleSync.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Aspire service defaults: OpenTelemetry, health checks, service discovery, resilience.
@@ -5,6 +12,11 @@ builder.AddServiceDefaults();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton(TimeProvider.System);
+
+builder.Services.AddCycleSyncDatabase(builder.Configuration);
+builder.Services.AddCycleSyncAuth(builder.Configuration);
 
 var app = builder.Build();
 
@@ -15,12 +27,18 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-// --- API surface (Phase 0 walking skeleton) ---
-var api = app.MapGroup("/api");
+app.UseAuthentication();
+app.UseAuthorization();
 
-// A trivial liveness probe the SPA shell calls to prove end-to-end connectivity.
+// --- API surface ---
+var api = app.MapGroup("/api");
 api.MapGet("/ping", () => Results.Ok(new PingResponse("CycleSync", "ok")))
    .WithName("Ping");
+
+app.MapAuthEndpoints();
+app.MapProfileEndpoints();
+app.MapUsersEndpoints();
+app.MapLocationsEndpoints();
 
 // Maps /health and /alive (Development) from ServiceDefaults.
 app.MapDefaultEndpoints();

@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CycleSync.Api\CycleSync.Api.csproj" />
+    <ProjectReference Include="..\CycleSync.MigrationService\CycleSync.MigrationService.csproj" />
   </ItemGroup>
 
 </Project>

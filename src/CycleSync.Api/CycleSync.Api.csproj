@@ -6,10 +6,15 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" />
+    <PackageReference Include="Google.Apis.Auth" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CycleSync.ServiceDefaults\CycleSync.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\CycleSync.Domain\CycleSync.Domain.csproj" />
+    <ProjectReference Include="..\CycleSync.Infrastructure\CycleSync.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

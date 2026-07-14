@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <UserSecretsId>cyclesync-migrationservice</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CycleSync.Infrastructure\CycleSync.Infrastructure.csproj" />
+    <ProjectReference Include="..\CycleSync.ServiceDefaults\CycleSync.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>

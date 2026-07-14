@@ -7,10 +7,15 @@ var sqlServer = builder.AddSqlServer("sqlserver")
 
 var database = sqlServer.AddDatabase("cyclesync");
 
-// The ASP.NET Core API. References the database so the connection string is injected.
+// Applies EF Core migrations on startup, then completes.
+var migrations = builder.AddProject<Projects.CycleSync_MigrationService>("migrations")
+    .WithReference(database)
+    .WaitFor(database);
+
+// The ASP.NET Core API. Waits for migrations to finish before serving.
 var api = builder.AddProject<Projects.CycleSync_Api>("api")
     .WithReference(database)
-    .WaitFor(database)
+    .WaitForCompletion(migrations)
     .WithHttpHealthCheck("/health")
     .WithExternalHttpEndpoints();
 

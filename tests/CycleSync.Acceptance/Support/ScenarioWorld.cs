@@ -20,6 +20,9 @@ public sealed class ScenarioWorld : IDisposable
     public HttpResponseMessage? LastResponse { get; set; }
     public string? LastBody { get; private set; }
 
+    /// <summary>The controllable clock the API uses; lets steps generate data at a chosen time.</summary>
+    public ControllableTimeProvider Clock => _factory.Clock;
+
     // Accumulated profile edits (a PUT replaces the whole profile, so steps build it up).
     public string? PendingHomeLocation { get; set; }
     public string? PendingCurrency { get; set; }

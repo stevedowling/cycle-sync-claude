@@ -24,10 +24,12 @@ builder.Services.AddCycleSyncDatabase(builder.Configuration);
 builder.Services.AddCycleSyncAuth(builder.Configuration);
 builder.Services.AddCycleSyncIntegrations(builder.Configuration);
 
-// Hermetic end-to-end mode (Playwright): swap Google validation for an offline stand-in so tests
-// can sign in without contacting Google. Never active in Development or Production. The database
-// stays real SQL Server (supplied by the CI service container).
-if (builder.Environment.IsEnvironment("E2E"))
+// Offline development & hermetic E2E: swap the external Google and Azure Maps dependencies for
+// deterministic offline stand-ins so the app is fully clickable locally (and hermetic under
+// Playwright) without a Google project or an Azure Maps key — the dev email sign-in accepts any
+// allowed-domain address. Production always uses the real integrations; the database stays real
+// SQL Server (Aspire locally, the CI service container in E2E).
+if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("E2E"))
 {
     builder.Services.RemoveAll<IGoogleTokenValidator>();
     builder.Services.AddSingleton<IGoogleTokenValidator, OfflineGoogleTokenValidator>();

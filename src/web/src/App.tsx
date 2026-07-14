@@ -41,7 +41,7 @@ function App() {
       </main>
 
       <footer className="app-footer">
-        <span>CycleSync · Phase 2 — locations &amp; discovery</span>
+        <span>CycleSync · Phase 3 — interest tracking</span>
       </footer>
     </div>
   );

@@ -1,10 +1,10 @@
 namespace CycleSync.Api.Auth;
 
 /// <summary>
-/// Offline stand-in for Google token validation, used <b>only</b> in the hermetic <c>E2E</c>
-/// environment so Playwright can sign in without contacting Google. The "ID token" is simply the
-/// user's email; the display name is derived from the local part. This is never registered in
-/// Development or Production — see <c>Program.cs</c>.
+/// Offline stand-in for Google token validation, used in <c>Development</c> and the hermetic
+/// <c>E2E</c> environment so the dev email sign-in works (and Playwright can sign in) without
+/// contacting Google. The "ID token" is simply the user's email; the display name is derived from
+/// the local part. Never registered in Production — see <c>Program.cs</c>.
 /// </summary>
 public sealed class OfflineGoogleTokenValidator : IGoogleTokenValidator
 {

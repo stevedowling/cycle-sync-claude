@@ -19,10 +19,13 @@ var api = builder.AddProject<Projects.CycleSync_Api>("api")
     .WithHttpHealthCheck("/health")
     .WithExternalHttpEndpoints();
 
-// The React (Vite) single-page app. Proxies /api to the API in development.
+// The React (Vite) single-page app. In development its dev server proxies /api to the API; the
+// proxy target is read from SERVER_HTTP (see src/web/vite.config.ts), so hand it the API's address.
+// http (not https) keeps the Node proxy from having to trust the ASP.NET dev certificate.
 var web = builder.AddViteApp("web", "../web")
     .WithReference(api)
-    .WaitFor(api);
+    .WaitFor(api)
+    .WithEnvironment("SERVER_HTTP", api.GetEndpoint("http"));
 
 // When published, the built SPA is copied into the API's wwwroot and served same-origin.
 api.PublishWithContainerFiles(web, "wwwroot");

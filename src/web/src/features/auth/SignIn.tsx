@@ -5,8 +5,9 @@ import { credentialsReceived } from './authSlice';
 
 /**
  * Development sign-in. It exchanges an email for a session by posting it to the auth endpoint,
- * which pairs with the offline Google validator used in dev/test. In production this is replaced
- * by the Google OIDC button; the resulting session token flows through the same slice.
+ * which pairs with the offline Google validator registered in Development and E2E (see the API's
+ * Program.cs). In production this is replaced by the Google OIDC button; the resulting session
+ * token flows through the same slice.
  */
 export function SignIn() {
   const dispatch = useAppDispatch();

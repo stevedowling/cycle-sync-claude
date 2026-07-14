@@ -30,4 +30,29 @@ test.describe('Locations & discovery', () => {
     await expect(page.getByTestId('intel-confidence')).toContainText(/Low|Medium|High/);
     await expect(page.getByTestId('intel-generated')).toContainText('Generated');
   });
+
+  test('mark interest and sort destinations by consensus', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('signin-email').fill('amara@cyclesync.example');
+    await page.getByTestId('signin-submit').click();
+    await expect(page.getByTestId('current-user')).toBeVisible();
+
+    // Persist two destinations from the offline gazetteer.
+    for (const city of ['Lisbon', 'Tallinn']) {
+      await page.getByTestId('search-input').fill(city);
+      await page.getByTestId('search-submit').click();
+      await page.getByTestId(`select-${city === 'Lisbon' ? 'Lisbon, Portugal' : 'Tallinn, Estonia'}`).click();
+    }
+
+    // Mark interest in Lisbon; the count reflects it and the button shows the active state.
+    const lisbonToggle = page.getByTestId('interest-toggle-Lisbon, Portugal');
+    await lisbonToggle.click();
+    await expect(page.getByTestId('interest-count-Lisbon, Portugal')).toContainText('1 interested');
+    await expect(lisbonToggle).toHaveAttribute('aria-pressed', 'true');
+
+    // With consensus sort on, the destination with more interest ranks first.
+    await page.getByTestId('sort-by-interest').check();
+    const firstItem = page.getByTestId('location-list').locator('li').first();
+    await expect(firstItem).toContainText('Lisbon, Portugal');
+  });
 });

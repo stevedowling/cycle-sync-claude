@@ -27,6 +27,8 @@ export interface LocationResponse {
   country: string;
   coordinates: Coordinates;
   createdAt: string;
+  interestCount: number;
+  isInterested: boolean;
 }
 
 export interface LocationIntelligence {

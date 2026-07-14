@@ -122,13 +122,41 @@ button:disabled {
   gap: 0.5rem;
 }
 
-.search-result {
+.search-result,
+.location-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding: 0.5rem 0;
   border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.sort-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.interest-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.interest-on {
+  border-color: #d97706;
+  color: #d97706;
 }
 
 .intel-meta {

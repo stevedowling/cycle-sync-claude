@@ -1,5 +1,6 @@
 using CycleSync.Api.Auth;
 using CycleSync.Api.Features.Auth;
+using CycleSync.Api.Features.Interests;
 using CycleSync.Api.Features.Locations;
 using CycleSync.Api.Features.Profile;
 using CycleSync.Api.Features.Users;
@@ -63,6 +64,7 @@ app.MapAuthEndpoints();
 app.MapProfileEndpoints();
 app.MapUsersEndpoints();
 app.MapLocationsEndpoints();
+app.MapInterestsEndpoints();
 
 // Maps /health and /alive (Development) from ServiceDefaults.
 app.MapDefaultEndpoints();

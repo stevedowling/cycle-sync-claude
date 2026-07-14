@@ -1,0 +1,5 @@
+{
+  "appHost": {
+    "path": "src/CycleSync.AppHost/CycleSync.AppHost.csproj"
+  }
+}

@@ -1,0 +1,20 @@
+# .NET build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+
+# Aspire / DCP
+.aspire/
+
+# Node / Vite
+node_modules/
+dist/
+*.log
+
+# SPA build copied into the API for container publish
+src/CycleSync.Api/wwwroot/
+
+# Local tooling
+.dotnet/

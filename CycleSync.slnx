@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CycleSync.Api/CycleSync.Api.csproj" />
+    <Project Path="src/CycleSync.AppHost/CycleSync.AppHost.csproj" />
+    <Project Path="src/CycleSync.ServiceDefaults/CycleSync.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CycleSync.Acceptance/CycleSync.Acceptance.csproj" />
+  </Folder>
+</Solution>

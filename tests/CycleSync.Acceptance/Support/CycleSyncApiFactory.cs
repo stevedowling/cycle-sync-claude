@@ -1,4 +1,5 @@
 using CycleSync.Api.Auth;
+using CycleSync.Api.Integrations.Maps;
 using CycleSync.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -22,6 +23,9 @@ public sealed class CycleSyncApiFactory : WebApplicationFactory<Program>
 {
     private readonly SqliteConnection _connection = new("DataSource=:memory:");
     private bool _schemaCreated;
+
+    /// <summary>Controllable clock shared with the API so scenarios can travel through time.</summary>
+    public ControllableTimeProvider Clock { get; } = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -57,6 +61,14 @@ public sealed class CycleSyncApiFactory : WebApplicationFactory<Program>
             // Offline Google validation.
             services.RemoveAll<IGoogleTokenValidator>();
             services.AddSingleton<IGoogleTokenValidator, FakeGoogleTokenValidator>();
+
+            // Offline, deterministic Azure Maps search.
+            services.RemoveAll<IMapsSearch>();
+            services.AddSingleton<IMapsSearch, FakeMapsSearch>();
+
+            // Controllable clock so intelligence caching/freshness can be exercised.
+            services.RemoveAll<TimeProvider>();
+            services.AddSingleton<TimeProvider>(Clock);
         });
     }
 

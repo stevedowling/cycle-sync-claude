@@ -3,6 +3,7 @@ using CycleSync.Api.Features.Auth;
 using CycleSync.Api.Features.Locations;
 using CycleSync.Api.Features.Profile;
 using CycleSync.Api.Features.Users;
+using CycleSync.Api.Integrations;
 using CycleSync.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 
 builder.Services.AddCycleSyncDatabase(builder.Configuration);
 builder.Services.AddCycleSyncAuth(builder.Configuration);
+builder.Services.AddCycleSyncIntegrations(builder.Configuration);
 
 var app = builder.Build();
 

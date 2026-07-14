@@ -23,6 +23,7 @@ implement until it passes.
 | [docs/07-solution-structure.md](docs/07-solution-structure.md) | Projects, folders, naming, tooling |
 | [docs/08-phase-0-walking-skeleton.md](docs/08-phase-0-walking-skeleton.md) | Phase 0 (built): what exists, how to run, limitations |
 | [docs/09-phase-1-auth-profiles.md](docs/09-phase-1-auth-profiles.md) | Phase 1 (built): auth, profiles, persistence, testing approach |
+| [docs/10-phase-2-locations-discovery.md](docs/10-phase-2-locations-discovery.md) | Phase 2 (built): location search, persistence, AI intelligence |
 | [tests/features/](tests/features/) | Executable Gherkin feature files (the BDD specs) |
 
 ## Guiding principles (from the brief)
@@ -80,9 +81,11 @@ are green in CI and the slice is reachable in the running Aspire app.
 - Reqnroll suite green (11/11). **Details:** [docs/09-phase-1-auth-profiles.md](docs/09-phase-1-auth-profiles.md)
 - **Features:** `authentication.feature`, `user-profile.feature`
 
-### Phase 2 — Locations & discovery
-- Azure Maps-backed location search.
-- Location persistence (permanent); AI-generated intelligence with timestamp + confidence.
+### Phase 2 — Locations & discovery ✅ built
+- Azure Maps-backed location search (proxied server-side behind `IMapsSearch`).
+- Location persistence (permanent, de-duplicated); AI-generated intelligence with timestamp +
+  confidence, cached and regenerated when stale; passport-aware visa guidance.
+- Reqnroll suite green (19/19). **Details:** [docs/10-phase-2-locations-discovery.md](docs/10-phase-2-locations-discovery.md)
 - **Features:** `location-search.feature`, `location-intelligence.feature`
 
 ### Phase 3 — Interest tracking

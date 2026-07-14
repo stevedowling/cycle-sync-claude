@@ -34,6 +34,8 @@
     <ReqnrollFeatureFile Include="..\features\smoke.feature" Link="Features\smoke.feature" />
     <ReqnrollFeatureFile Include="..\features\authentication.feature" Link="Features\authentication.feature" />
     <ReqnrollFeatureFile Include="..\features\user-profile.feature" Link="Features\user-profile.feature" />
+    <ReqnrollFeatureFile Include="..\features\location-search.feature" Link="Features\location-search.feature" />
+    <ReqnrollFeatureFile Include="..\features\location-intelligence.feature" Link="Features\location-intelligence.feature" />
   </ItemGroup>
 
   <ItemGroup>

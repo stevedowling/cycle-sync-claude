@@ -14,8 +14,8 @@ jobs:
   dotnet-acceptance:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
       - run: dotnet tool restore
@@ -28,8 +28,8 @@ jobs:
       run:
         working-directory: src/web
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -57,11 +57,13 @@ jobs:
           --health-timeout 5s
           --health-retries 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
       - run: dotnet tool restore
+      - name: Restore NuGet packages
+        run: dotnet restore src/CycleSync.Infrastructure/CycleSync.Infrastructure.csproj
       - name: Apply migrations to SQL Server
         run: >-
           dotnet ef database update
@@ -93,11 +95,11 @@ jobs:
       ASPNETCORE_ENVIRONMENT: E2E
       ASPNETCORE_URLS: http://localhost:5000
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
 
@@ -114,18 +116,20 @@ jobs:
 
       - name: Start the API (E2E environment)
         run: |
-          # nohup + disown so the server survives this step and stays up for the Playwright step.
-          nohup dotnet run --project src/CycleSync.Api/CycleSync.Api.csproj --no-launch-profile \
-            > api.log 2>&1 &
-          disown || true
-          echo "Waiting for the API to become healthy…"
+          # setsid detaches the server into its own session so it survives this step and stays up
+          # for the Playwright step.
+          setsid nohup dotnet run --project src/CycleSync.Api/CycleSync.Api.csproj --no-launch-profile \
+            > api.log 2>&1 < /dev/null &
+          # Probe /api/ping, not /health: ServiceDefaults only maps the health endpoints in the
+          # Development environment, and the API runs here as E2E.
+          echo "Waiting for the API to become ready…"
           for i in $(seq 1 60); do
-            if curl -fsS http://localhost:5000/health > /dev/null; then
+            if curl -fsS http://localhost:5000/api/ping > /dev/null; then
               echo "API is up."; exit 0
             fi
             sleep 2
           done
-          echo "API did not become healthy in time. Recent log:" >&2
+          echo "API did not become ready in time. Recent log:" >&2
           tail -n 100 api.log >&2 || true
           exit 1
 
@@ -143,7 +147,7 @@ jobs:
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: tests/e2e/playwright-report

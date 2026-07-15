@@ -37,6 +37,9 @@
     <ReqnrollFeatureFile Include="..\features\location-search.feature" Link="Features\location-search.feature" />
     <ReqnrollFeatureFile Include="..\features\location-intelligence.feature" Link="Features\location-intelligence.feature" />
     <ReqnrollFeatureFile Include="..\features\interest-tracking.feature" Link="Features\interest-tracking.feature" />
+    <ReqnrollFeatureFile Include="..\features\off-cycle-planning.feature" Link="Features\off-cycle-planning.feature" />
+    <ReqnrollFeatureFile Include="..\features\attendance-status.feature" Link="Features\attendance-status.feature" />
+    <ReqnrollFeatureFile Include="..\features\cost-estimation.feature" Link="Features\cost-estimation.feature" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,3 +1,4 @@
+using CycleSync.Api.Integrations.Cost;
 using CycleSync.Api.Integrations.Intelligence;
 using CycleSync.Api.Integrations.Maps;
 
@@ -16,6 +17,7 @@ public static class IntegrationsServiceCollectionExtensions
         services.AddHttpClient<IMapsSearch, AzureMapsSearch>();
 
         services.AddSingleton<ILocationIntelligenceGenerator, HeuristicLocationIntelligenceGenerator>();
+        services.AddScoped<ICostEstimator, HeuristicCostEstimator>();
 
         return services;
     }

@@ -1,4 +1,6 @@
 using CycleSync.Api.Auth;
+using CycleSync.Api.Features.Cost;
+using CycleSync.Api.Integrations.Cost;
 using CycleSync.Api.Integrations.Intelligence;
 using CycleSync.Api.Integrations.Maps;
 using CycleSync.Domain.Locations;
@@ -166,6 +168,27 @@ public static class LocationsEndpoints
             await db.SaveChangesAsync(cancellationToken);
 
             return Results.Ok(intelligence.ToResponse());
+        });
+
+        // Generic heuristic cost estimate for the current user (a nominal stay, not tied to dates).
+        // The date-specific counterpart lives at /api/off-cycles/{id}/cost-estimate.
+        group.MapGet("/{id:guid}/cost-estimate", async (
+            Guid id,
+            ICurrentUser current,
+            CycleSyncDbContext db,
+            ICostEstimator estimator,
+            TimeProvider clock,
+            CancellationToken cancellationToken) =>
+        {
+            var location = await db.Locations.AsNoTracking().FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
+            if (location is null)
+            {
+                return Results.NotFound();
+            }
+
+            var estimate = await CostEstimates.BuildAsync(
+                current.Id, location, CostEstimates.GenericStayNights, db, estimator, clock, cancellationToken);
+            return Results.Ok(estimate);
         });
 
         return app;

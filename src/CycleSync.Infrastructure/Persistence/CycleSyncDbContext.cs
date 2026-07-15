@@ -1,5 +1,6 @@
 using CycleSync.Domain.Interests;
 using CycleSync.Domain.Locations;
+using CycleSync.Domain.OffCycles;
 using CycleSync.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,7 @@ public sealed class CycleSyncDbContext(DbContextOptions<CycleSyncDbContext> opti
     public DbSet<User> Users => Set<User>();
     public DbSet<Location> Locations => Set<Location>();
     public DbSet<LocationIntelligence> LocationIntelligence => Set<LocationIntelligence>();
+    public DbSet<OffCycle> OffCycles => Set<OffCycle>();
     public DbSet<Interest> Interests => Set<Interest>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

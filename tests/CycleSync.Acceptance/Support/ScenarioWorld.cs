@@ -28,6 +28,12 @@ public sealed class ScenarioWorld : IDisposable
     public string? PendingCurrency { get; set; }
     public string? PendingLanguage { get; set; }
 
+    /// <summary>
+    /// The most recently created entity (a location or an off-cycle) and its name. Lets a single
+    /// "it is visible to all users" step assert against whichever kind was just created.
+    /// </summary>
+    public (string Kind, string Name)? LastCreated { get; set; }
+
     public HttpClient Client
     {
         get
@@ -97,6 +103,36 @@ public sealed class ScenarioWorld : IDisposable
     {
         using var doc = JsonDocument.Parse(LastBody ?? "null");
         return doc.RootElement.Clone();
+    }
+
+    /// <summary>
+    /// Ensures a location with the given display name is persisted (searching then persisting via the
+    /// real API, which is de-duplicated) and returns its id. Shared by the location and off-cycle
+    /// steps so an off-cycle can be created against a location that a scenario has not persisted
+    /// explicitly. Marks it as the last-created entity.
+    /// </summary>
+    public async Task<Guid> EnsureLocationAsync(string name)
+    {
+        await GetAsync($"/api/locations/search?q={Uri.EscapeDataString(name)}");
+        var result = LastJsonClone().EnumerateArray().Single(r => r.GetProperty("name").GetString() == name);
+        var coordinates = result.GetProperty("coordinates");
+        var azureMapsId = result.TryGetProperty("azureMapsId", out var idElement) && idElement.ValueKind == JsonValueKind.String
+            ? idElement.GetString()
+            : null;
+
+        await PostJsonAsync("/api/locations", new
+        {
+            name = result.GetProperty("name").GetString(),
+            country = result.GetProperty("country").GetString(),
+            latitude = coordinates.GetProperty("latitude").GetDouble(),
+            longitude = coordinates.GetProperty("longitude").GetDouble(),
+            azureMapsId,
+        });
+        LastCreated = ("location", name);
+
+        await GetAsync("/api/locations");
+        var location = LastJsonClone().EnumerateArray().First(l => l.GetProperty("name").GetString() == name);
+        return location.GetProperty("id").GetGuid();
     }
 
     public T? LastAs<T>() => LastBody is null ? default : JsonSerializer.Deserialize<T>(LastBody, Json);

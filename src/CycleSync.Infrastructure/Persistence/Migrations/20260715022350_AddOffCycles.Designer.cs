@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CycleSync.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(CycleSyncDbContext))]
-    [Migration("20260715004104_AddOffCycles")]
+    [Migration("20260715022350_AddOffCycles")]
     partial class AddOffCycles
     {
         /// <inheritdoc />
@@ -24,6 +24,24 @@ namespace CycleSync.Infrastructure.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("CycleSync.Domain.Interests.Interest", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("UserId", "LocationId");
+
+                    b.HasIndex("LocationId");
+
+                    b.ToTable("Interests", (string)null);
+                });
 
             modelBuilder.Entity("CycleSync.Domain.Locations.Location", b =>
                 {
@@ -189,6 +207,21 @@ namespace CycleSync.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("CycleSync.Domain.Interests.Interest", b =>
+                {
+                    b.HasOne("CycleSync.Domain.Locations.Location", null)
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CycleSync.Domain.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("CycleSync.Domain.Locations.Location", b =>

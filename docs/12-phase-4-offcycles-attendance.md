@@ -20,9 +20,9 @@ location. The BDD suite now runs **36 scenarios** across eight feature files.
 | API (integrations) | [src/CycleSync.Api/Integrations/Cost](../src/CycleSync.Api/Integrations/Cost) | `ICostEstimator` abstraction + heuristic implementation |
 | Web (SPA) | [src/web/src/features/offcycles](../src/web/src/features/offcycles) | Off-cycles screen wired via RTK Query: plan, list, set attendance |
 
-## Green scenarios (36 total)
+## Green scenarios (41 total)
 
-- Phases 0–2 unchanged — 19.
+- Phases 0–3 unchanged — 24 (adds Phase 3 interest tracking, merged from main).
 - [`off-cycle-planning.feature`](../tests/features/off-cycle-planning.feature) — 4: create an
   off-cycle, creator seeded `Interested`, reject `end < start`, and edit dates (cost recalculated).
 - [`attendance-status.feature`](../tests/features/attendance-status.feature) — 8: set each of the
@@ -32,7 +32,7 @@ location. The BDD suite now runs **36 scenarios** across eight feature files.
   differs by the traveller's home location.
 
 ```
-Passed!  - Failed: 0, Passed: 36, Skipped: 0, Total: 36 - CycleSync.Acceptance.dll (net10.0)
+Passed!  - Failed: 0, Passed: 41, Skipped: 0, Total: 41 - CycleSync.Acceptance.dll (net10.0)
 ```
 
 ## Endpoints added

@@ -1,9 +1,9 @@
 namespace CycleSync.Api.Integrations.Maps;
 
 /// <summary>
-/// Deterministic, offline gazetteer used <b>only</b> in the hermetic <c>E2E</c> environment so
-/// Playwright can search without an Azure Maps key. A result matches when the query appears in its
-/// name (case-insensitive). Never registered in Development or Production — see <c>Program.cs</c>.
+/// Deterministic, offline gazetteer used in <c>Development</c> and the hermetic <c>E2E</c>
+/// environment so location search works without an Azure Maps key. A result matches when the query
+/// appears in its name (case-insensitive). Never registered in Production — see <c>Program.cs</c>.
 /// </summary>
 public sealed class OfflineMapsSearch : IMapsSearch
 {
@@ -13,6 +13,7 @@ public sealed class OfflineMapsSearch : IMapsSearch
         new("Auckland, New Zealand", "New Zealand", -36.8485, 174.7633, "NZ/Auckland"),
         new("Barcelona, Spain", "Spain", 41.3874, 2.1686, "ES/Barcelona"),
         new("Singapore", "Singapore", 1.3521, 103.8198, "SG/Singapore"),
+        new("Tallinn, Estonia", "Estonia", 59.4370, 24.7536, "EE/Tallinn"),
     ];
 
     public Task<IReadOnlyList<MapsSearchResult>> SearchAsync(string query, CancellationToken cancellationToken)

@@ -4,6 +4,7 @@ using CycleSync.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CycleSync.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(CycleSyncDbContext))]
-    partial class CycleSyncDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260714113631_AddInterests")]
+    partial class AddInterests
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,64 +113,6 @@ namespace CycleSync.Infrastructure.Persistence.Migrations
                     b.ToTable("LocationIntelligence", (string)null);
                 });
 
-            modelBuilder.Entity("CycleSync.Domain.OffCycles.Attendance", b =>
-                {
-                    b.Property<Guid>("OffCycleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
-
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("OffCycleId", "UserId");
-
-                    b.ToTable("Attendances", (string)null);
-                });
-
-            modelBuilder.Entity("CycleSync.Domain.OffCycles.OffCycle", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid>("CreatedByUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<Guid>("LocationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
-
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LocationId");
-
-                    b.ToTable("OffCycles", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_OffCycles_EndAfterStart", "[EndDate] >= [StartDate]");
-                        });
-                });
-
             modelBuilder.Entity("CycleSync.Domain.Users.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -257,24 +202,6 @@ namespace CycleSync.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CycleSync.Domain.OffCycles.Attendance", b =>
-                {
-                    b.HasOne("CycleSync.Domain.OffCycles.OffCycle", null)
-                        .WithMany("Attendances")
-                        .HasForeignKey("OffCycleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("CycleSync.Domain.OffCycles.OffCycle", b =>
-                {
-                    b.HasOne("CycleSync.Domain.Locations.Location", null)
-                        .WithMany()
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("CycleSync.Domain.Users.User", b =>
                 {
                     b.OwnsOne("CycleSync.Domain.Users.GeoPlace", "HomeLocation", b1 =>
@@ -340,11 +267,6 @@ namespace CycleSync.Infrastructure.Persistence.Migrations
                     b.Navigation("HomeLocation");
 
                     b.Navigation("Passports");
-                });
-
-            modelBuilder.Entity("CycleSync.Domain.OffCycles.OffCycle", b =>
-                {
-                    b.Navigation("Attendances");
                 });
 #pragma warning restore 612, 618
         }

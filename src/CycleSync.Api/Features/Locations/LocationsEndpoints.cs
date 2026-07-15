@@ -74,17 +74,54 @@ public static class LocationsEndpoints
             return Results.Created($"/api/locations/{location.Id}", location.ToResponse());
         });
 
-        // All persisted locations — visible to every authenticated user (privacy-friendly).
-        group.MapGet("/", async (CycleSyncDbContext db, CancellationToken cancellationToken) =>
+        // All persisted locations — visible to every authenticated user (privacy-friendly). Each row
+        // carries its team-wide interest count and whether the caller is interested. Pass
+        // ?sort=interest for consensus order (most interest first, name as a stable tie-break).
+        group.MapGet("/", async (
+            string? sort,
+            ICurrentUser current,
+            CycleSyncDbContext db,
+            CancellationToken cancellationToken) =>
         {
-            var locations = await db.Locations.AsNoTracking().OrderBy(l => l.Name).ToListAsync(cancellationToken);
-            return Results.Ok(locations.Select(l => l.ToResponse()).ToArray());
+            var locations = await db.Locations.AsNoTracking().ToListAsync(cancellationToken);
+
+            var counts = await db.Interests
+                .GroupBy(i => i.LocationId)
+                .Select(g => new { LocationId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.LocationId, x => x.Count, cancellationToken);
+
+            var mine = (await db.Interests
+                .Where(i => i.UserId == current.Id)
+                .Select(i => i.LocationId)
+                .ToListAsync(cancellationToken)).ToHashSet();
+
+            IEnumerable<Location> ordered = string.Equals(sort, "interest", StringComparison.OrdinalIgnoreCase)
+                ? locations.OrderByDescending(l => counts.GetValueOrDefault(l.Id)).ThenBy(l => l.Name)
+                : locations.OrderBy(l => l.Name);
+
+            var dtos = ordered
+                .Select(l => l.ToResponse(counts.GetValueOrDefault(l.Id), mine.Contains(l.Id)))
+                .ToArray();
+            return Results.Ok(dtos);
         });
 
-        group.MapGet("/{id:guid}", async (Guid id, CycleSyncDbContext db, CancellationToken cancellationToken) =>
+        group.MapGet("/{id:guid}", async (
+            Guid id,
+            ICurrentUser current,
+            CycleSyncDbContext db,
+            CancellationToken cancellationToken) =>
         {
             var location = await db.Locations.AsNoTracking().FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
-            return location is null ? Results.NotFound() : Results.Ok(location.ToResponse());
+            if (location is null)
+            {
+                return Results.NotFound();
+            }
+
+            var interestCount = await db.Interests.CountAsync(i => i.LocationId == id, cancellationToken);
+            var isInterested = await db.Interests
+                .AnyAsync(i => i.LocationId == id && i.UserId == current.Id, cancellationToken);
+
+            return Results.Ok(location.ToResponse(interestCount, isInterested));
         });
 
         // AI-generated intelligence: served from cache and regenerated only when stale. The visa

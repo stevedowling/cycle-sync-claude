@@ -3,15 +3,22 @@ import { Link } from 'react-router-dom';
 import {
   useGetLocationsQuery,
   useLazySearchLocationsQuery,
+  useMarkInterestMutation,
   usePersistLocationMutation,
+  useRemoveInterestMutation,
 } from '../api/apiSlice';
-import type { LocationSearchResult } from '../../app/types';
+import type { LocationResponse, LocationSearchResult } from '../../app/types';
 
 export function LocationsPage() {
   const [query, setQuery] = useState('');
+  const [sortByInterest, setSortByInterest] = useState(false);
   const [runSearch, searchState] = useLazySearchLocationsQuery();
   const [persistLocation, { isLoading: isPersisting }] = usePersistLocationMutation();
-  const { data: locations = [], isLoading: isLoadingLocations } = useGetLocationsQuery();
+  const [markInterest] = useMarkInterestMutation();
+  const [removeInterest] = useRemoveInterestMutation();
+  const { data: locations = [], isLoading: isLoadingLocations } = useGetLocationsQuery(
+    sortByInterest ? { sort: 'interest' } : undefined,
+  );
 
   const onSearch = async (event: FormEvent) => {
     event.preventDefault();
@@ -23,6 +30,14 @@ export function LocationsPage() {
 
   const onSelect = async (result: LocationSearchResult) => {
     await persistLocation(result).unwrap();
+  };
+
+  const onToggleInterest = async (location: LocationResponse) => {
+    if (location.isInterested) {
+      await removeInterest(location.id).unwrap();
+    } else {
+      await markInterest(location.id).unwrap();
+    }
   };
 
   return (
@@ -69,9 +84,20 @@ export function LocationsPage() {
       </section>
 
       <section className="card" aria-labelledby="saved-heading">
-        <h2 id="saved-heading" className="section-title">
-          Saved destinations
-        </h2>
+        <div className="section-header">
+          <h2 id="saved-heading" className="section-title">
+            Saved destinations
+          </h2>
+          <label className="sort-toggle">
+            <input
+              type="checkbox"
+              checked={sortByInterest}
+              onChange={(e) => setSortByInterest(e.target.checked)}
+              data-testid="sort-by-interest"
+            />
+            Sort by interest
+          </label>
+        </div>
         {isLoadingLocations ? (
           <p role="status">Loading destinations…</p>
         ) : locations.length === 0 ? (
@@ -80,10 +106,26 @@ export function LocationsPage() {
           <ul className="location-list" data-testid="location-list">
             {locations.map((location) => (
               <li key={location.id} className="location-item">
-                <Link to={`/locations/${location.id}`} data-testid={`location-${location.name}`}>
-                  {location.name}
-                </Link>
-                <span className="muted"> · {location.country}</span>
+                <span>
+                  <Link to={`/locations/${location.id}`} data-testid={`location-${location.name}`}>
+                    {location.name}
+                  </Link>
+                  <span className="muted"> · {location.country}</span>
+                </span>
+                <span className="interest-controls">
+                  <span className="badge" data-testid={`interest-count-${location.name}`}>
+                    {location.interestCount} interested
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => onToggleInterest(location)}
+                    aria-pressed={location.isInterested}
+                    className={location.isInterested ? 'interest-on' : undefined}
+                    data-testid={`interest-toggle-${location.name}`}
+                  >
+                    {location.isInterested ? '★ Interested' : '☆ Mark interest'}
+                  </button>
+                </span>
               </li>
             ))}
           </ul>

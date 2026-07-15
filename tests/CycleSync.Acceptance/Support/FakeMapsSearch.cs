@@ -16,6 +16,7 @@ public sealed class FakeMapsSearch : IMapsSearch
         new("London, United Kingdom", "United Kingdom", 51.5072, -0.1276, "GB/London"),
         new("Barcelona, Spain", "Spain", 41.3874, 2.1686, "ES/Barcelona"),
         new("Singapore", "Singapore", 1.3521, 103.8198, "SG/Singapore"),
+        new("Tallinn, Estonia", "Estonia", 59.4370, 24.7536, "EE/Tallinn"),
     ];
 
     public Task<IReadOnlyList<MapsSearchResult>> SearchAsync(string query, CancellationToken cancellationToken)

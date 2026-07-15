@@ -30,9 +30,17 @@ export const apiSlice = createApi({
     signIn: builder.mutation<SignInResponse, { idToken: string }>({
       query: (body) => ({ url: '/auth/google', method: 'POST', body }),
     }),
-    getLocations: builder.query<LocationResponse[], void>({
-      query: () => '/locations',
+    getLocations: builder.query<LocationResponse[], { sort?: 'interest' } | void>({
+      query: (arg) => (arg && arg.sort ? `/locations?sort=${arg.sort}` : '/locations'),
       providesTags: ['Locations'],
+    }),
+    markInterest: builder.mutation<void, string>({
+      query: (id) => ({ url: `/locations/${id}/interest`, method: 'PUT' }),
+      invalidatesTags: ['Locations'],
+    }),
+    removeInterest: builder.mutation<void, string>({
+      query: (id) => ({ url: `/locations/${id}/interest`, method: 'DELETE' }),
+      invalidatesTags: ['Locations'],
     }),
     searchLocations: builder.query<LocationSearchResult[], string>({
       query: (q) => `/locations/search?q=${encodeURIComponent(q)}`,
@@ -85,6 +93,8 @@ export const {
   useGetLocationsQuery,
   useLazySearchLocationsQuery,
   usePersistLocationMutation,
+  useMarkInterestMutation,
+  useRemoveInterestMutation,
   useGetIntelligenceQuery,
   useGetOffCyclesQuery,
   useCreateOffCycleMutation,

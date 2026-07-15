@@ -24,7 +24,8 @@ implement until it passes.
 | [docs/08-phase-0-walking-skeleton.md](docs/08-phase-0-walking-skeleton.md) | Phase 0 (built): what exists, how to run, limitations |
 | [docs/09-phase-1-auth-profiles.md](docs/09-phase-1-auth-profiles.md) | Phase 1 (built): auth, profiles, persistence, testing approach |
 | [docs/10-phase-2-locations-discovery.md](docs/10-phase-2-locations-discovery.md) | Phase 2 (built): location search, persistence, AI intelligence |
-| [docs/11-phase-4-offcycles-attendance.md](docs/11-phase-4-offcycles-attendance.md) | Phase 4 (built): off-cycles, attendance, cost estimation |
+| [docs/11-phase-3-interest-tracking.md](docs/11-phase-3-interest-tracking.md) | Phase 3 (built): interest tracking, counts, consensus sort |
+| [docs/12-phase-4-offcycles-attendance.md](docs/12-phase-4-offcycles-attendance.md) | Phase 4 (built): off-cycles, attendance, cost estimation |
 | [tests/features/](tests/features/) | Executable Gherkin feature files (the BDD specs) |
 
 ## Guiding principles (from the brief)
@@ -92,8 +93,12 @@ are green in CI and the slice is reachable in the running Aspire app.
   GitHub Actions CI. **Details:** [docs/10-phase-2-locations-discovery.md](docs/10-phase-2-locations-discovery.md)
 - **Features:** `location-search.feature`, `location-intelligence.feature`
 
-### Phase 3 — Interest tracking
-- Mark/unmark interest; interest counts; sort by consensus.
+### Phase 3 — Interest tracking ✅ built
+- Mark/unmark interest (idempotent `PUT`/`DELETE`); team-wide interest counts on every location.
+- Location list/detail carry `interestCount` + `isInterested`; `?sort=interest` yields consensus order.
+- `GET /api/me/interests` lists the caller's picks. React SPA gains a per-destination interest toggle
+  and a consensus sort, wired via RTK Query with Vitest tests and a Playwright E2E pass.
+- Reqnroll suite green (24/24). **Details:** [docs/11-phase-3-interest-tracking.md](docs/11-phase-3-interest-tracking.md)
 - **Features:** `interest-tracking.feature`
 
 ### Phase 4 — Off-cycles & attendance ✅ built
@@ -102,7 +107,7 @@ are green in CI and the slice is reachable in the running Aspire app.
 - Heuristic, date-specific cost estimates (distance-based flights, per-night accommodation/expenses),
   recomputed per request and reflecting the traveller's home location; confidence + timestamp disclosed.
 - React off-cycles screen wired via RTK Query (plan, list, set attendance).
-- Reqnroll suite green (36/36). **Details:** [docs/11-phase-4-offcycles-attendance.md](docs/11-phase-4-offcycles-attendance.md)
+- Reqnroll suite green (41/41). **Details:** [docs/12-phase-4-offcycles-attendance.md](docs/12-phase-4-offcycles-attendance.md)
 - **Features:** `off-cycle-planning.feature`, `attendance-status.feature`, `cost-estimation.feature`
 
 ### Phase 5 — Hardening

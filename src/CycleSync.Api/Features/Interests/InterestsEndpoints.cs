@@ -1,5 +1,6 @@
 using CycleSync.Api.Auth;
 using CycleSync.Api.Features.Locations;
+using CycleSync.Api.Http;
 using CycleSync.Domain.Interests;
 using CycleSync.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,7 @@ public static class InterestsEndpoints
             var locationExists = await db.Locations.AnyAsync(l => l.Id == id, cancellationToken);
             if (!locationExists)
             {
-                return Results.NotFound();
+                return Problems.NotFound();
             }
 
             var alreadyInterested = await db.Interests

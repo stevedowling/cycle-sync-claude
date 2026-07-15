@@ -1,5 +1,6 @@
 using CycleSync.Api.Auth;
 using CycleSync.Api.Features.Users;
+using CycleSync.Api.Http;
 using CycleSync.Domain.Users;
 using CycleSync.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -30,14 +31,12 @@ public static class AuthEndpoints
             }
             catch (Exception)
             {
-                return Results.Problem(statusCode: StatusCodes.Status401Unauthorized,
-                    title: "Invalid Google token", detail: "the Google token could not be validated", type: "unauthorized");
+                return Problems.Unauthorized("the Google token could not be validated");
             }
 
             if (!accessPolicy.IsEmailAllowed(identity.Email))
             {
-                return Results.Problem(statusCode: StatusCodes.Status403Forbidden,
-                    title: "Access denied", detail: "domain not permitted", type: "forbidden");
+                return Problems.Forbidden("domain not permitted");
             }
 
             var user = await db.Users.FirstOrDefaultAsync(u => u.Email == identity.Email, cancellationToken);
@@ -58,7 +57,7 @@ public static class AuthEndpoints
         group.MapGet("/me", async (ICurrentUser current, CycleSyncDbContext db, CancellationToken cancellationToken) =>
         {
             var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == current.Id, cancellationToken);
-            return user is null ? Results.NotFound() : Results.Ok(user.ToProfile());
+            return user is null ? Problems.NotFound() : Results.Ok(user.ToProfile());
         })
         .RequireAuthorization()
         .WithName("Me");

@@ -1,5 +1,6 @@
 using CycleSync.Api.Auth;
 using CycleSync.Api.Features.Cost;
+using CycleSync.Api.Http;
 using CycleSync.Api.Integrations.Cost;
 using CycleSync.Api.Integrations.Intelligence;
 using CycleSync.Api.Integrations.Maps;
@@ -23,8 +24,7 @@ public static class LocationsEndpoints
         {
             if (string.IsNullOrWhiteSpace(q))
             {
-                return Results.Problem(statusCode: StatusCodes.Status400BadRequest,
-                    title: "Invalid search", detail: "a search query is required", type: "validation");
+                return Problems.Validation("a search query is required");
             }
 
             try
@@ -37,8 +37,7 @@ public static class LocationsEndpoints
             }
             catch (Exception)
             {
-                return Results.Problem(statusCode: StatusCodes.Status502BadGateway,
-                    title: "Maps provider unavailable", detail: "the maps provider could not be reached", type: "upstream-unavailable");
+                return Problems.Upstream("the maps provider could not be reached");
             }
         });
 
@@ -52,8 +51,7 @@ public static class LocationsEndpoints
         {
             if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Country))
             {
-                return Results.Problem(statusCode: StatusCodes.Status400BadRequest,
-                    title: "Invalid location", detail: "name and country are required", type: "validation");
+                return Problems.Validation("name and country are required");
             }
 
             var existing = await FindExistingAsync(db, request, cancellationToken);
@@ -114,7 +112,7 @@ public static class LocationsEndpoints
             var location = await db.Locations.AsNoTracking().FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
             if (location is null)
             {
-                return Results.NotFound();
+                return Problems.NotFound();
             }
 
             var interestCount = await db.Interests.CountAsync(i => i.LocationId == id, cancellationToken);
@@ -137,7 +135,7 @@ public static class LocationsEndpoints
             var location = await db.Locations.AsNoTracking().FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
             if (location is null)
             {
-                return Results.NotFound();
+                return Problems.NotFound();
             }
 
             var cached = await db.LocationIntelligence.FirstOrDefaultAsync(i => i.LocationId == id, cancellationToken);
@@ -183,7 +181,7 @@ public static class LocationsEndpoints
             var location = await db.Locations.AsNoTracking().FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
             if (location is null)
             {
-                return Results.NotFound();
+                return Problems.NotFound();
             }
 
             var estimate = await CostEstimates.BuildAsync(

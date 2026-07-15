@@ -1,3 +1,4 @@
+using CycleSync.Api.Http;
 using CycleSync.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,7 @@ public static class UsersEndpoints
         group.MapGet("/{id:guid}", async (Guid id, CycleSyncDbContext db, CancellationToken cancellationToken) =>
         {
             var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
-            return user is null ? Results.NotFound() : Results.Ok(user.ToProfile());
+            return user is null ? Problems.NotFound() : Results.Ok(user.ToProfile());
         });
 
         return app;

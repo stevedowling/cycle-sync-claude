@@ -26,6 +26,7 @@ implement until it passes.
 | [docs/10-phase-2-locations-discovery.md](docs/10-phase-2-locations-discovery.md) | Phase 2 (built): location search, persistence, AI intelligence |
 | [docs/11-phase-3-interest-tracking.md](docs/11-phase-3-interest-tracking.md) | Phase 3 (built): interest tracking, counts, consensus sort |
 | [docs/12-phase-4-offcycles-attendance.md](docs/12-phase-4-offcycles-attendance.md) | Phase 4 (built): off-cycles, attendance, cost estimation |
+| [docs/13-phase-5-hardening.md](docs/13-phase-5-hardening.md) | Phase 5 (built): error taxonomy + cross-cutting principle gates |
 | [tests/features/](tests/features/) | Executable Gherkin feature files (the BDD specs) |
 
 ## Guiding principles (from the brief)
@@ -110,9 +111,16 @@ are green in CI and the slice is reachable in the running Aspire app.
 - Reqnroll suite green (41/41). **Details:** [docs/12-phase-4-offcycles-attendance.md](docs/12-phase-4-offcycles-attendance.md)
 - **Features:** `off-cycle-planning.feature`, `attendance-status.feature`, `cost-estimation.feature`
 
-### Phase 5 — Hardening
-- Telemetry dashboards, error taxonomy, accessibility pass, load smoke.
-- Cross-cutting principle scenarios (equal access, transparency, permanence) all green.
+### Phase 5 — Hardening ✅ built
+- Uniform, typed **error taxonomy**: a single `Problems` RFC 7807 factory (`not-found`, `validation`,
+  `forbidden`, `unauthorized`, `upstream`) replaces the mix of body-less `404`s and one-off slugs —
+  every failure is now a typed problem detail with a stable `type`, title and detail.
+- Cross-cutting principle scenarios (equal access, transparency, privacy, permanence) all green and
+  guarded as CI gates, plus a new `error-taxonomy.feature` gating the transparency of failures.
+- Telemetry via OpenTelemetry (`ServiceDefaults`) surfaced in the Aspire dashboard; a dedicated
+  axe-core accessibility sweep and load smoke are captured as future increments.
+- Reqnroll suite green (45/45). **Details:** [docs/13-phase-5-hardening.md](docs/13-phase-5-hardening.md)
+- **Features:** `error-taxonomy.feature`
 
 ## Out of scope (Future Enhancements)
 

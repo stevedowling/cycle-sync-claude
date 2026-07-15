@@ -1,5 +1,6 @@
 using CycleSync.Api.Auth;
 using CycleSync.Api.Features.Cost;
+using CycleSync.Api.Http;
 using CycleSync.Api.Integrations.Cost;
 using CycleSync.Domain;
 using CycleSync.Domain.Locations;
@@ -33,8 +34,7 @@ public static class OffCyclesEndpoints
                 .FirstOrDefaultAsync(l => l.Id == request.LocationId, cancellationToken);
             if (location is null)
             {
-                return Results.Problem(statusCode: StatusCodes.Status404NotFound,
-                    title: "Unknown location", detail: "the location does not exist", type: "not-found");
+                return Problems.NotFound("the location does not exist");
             }
 
             OffCycle offCycle;
@@ -66,7 +66,7 @@ public static class OffCyclesEndpoints
             var offCycle = await db.OffCycles.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
             if (offCycle is null)
             {
-                return Results.NotFound();
+                return Problems.NotFound();
             }
 
             var location = await db.Locations.AsNoTracking().FirstOrDefaultAsync(l => l.Id == offCycle.LocationId, cancellationToken);
@@ -85,7 +85,7 @@ public static class OffCyclesEndpoints
             var offCycle = await db.OffCycles.FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
             if (offCycle is null)
             {
-                return Results.NotFound();
+                return Problems.NotFound();
             }
 
             try
@@ -122,7 +122,7 @@ public static class OffCyclesEndpoints
                 .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
             if (offCycle is null)
             {
-                return Results.NotFound();
+                return Problems.NotFound();
             }
 
             offCycle.SetAttendance(current.Id, status, clock);
@@ -139,7 +139,7 @@ public static class OffCyclesEndpoints
                 .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
             if (offCycle is null)
             {
-                return Results.NotFound();
+                return Problems.NotFound();
             }
 
             var userIds = offCycle.Attendances.Select(a => a.UserId).ToList();
@@ -173,13 +173,13 @@ public static class OffCyclesEndpoints
             var offCycle = await db.OffCycles.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
             if (offCycle is null)
             {
-                return Results.NotFound();
+                return Problems.NotFound();
             }
 
             var location = await db.Locations.AsNoTracking().FirstOrDefaultAsync(l => l.Id == offCycle.LocationId, cancellationToken);
             if (location is null)
             {
-                return Results.NotFound();
+                return Problems.NotFound();
             }
 
             var estimate = await CostEstimates.BuildAsync(current.Id, location, offCycle.Nights, db, estimator, clock, cancellationToken);
@@ -189,9 +189,7 @@ public static class OffCyclesEndpoints
         return app;
     }
 
-    private static IResult Validation(string detail) =>
-        Results.Problem(statusCode: StatusCodes.Status400BadRequest,
-            title: "Invalid off-cycle", detail: detail, type: "validation");
+    private static IResult Validation(string detail) => Problems.Validation(detail);
 
     private static async Task<Dictionary<Guid, string>> LocationNamesAsync(
         CycleSyncDbContext db,

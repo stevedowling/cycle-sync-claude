@@ -1,5 +1,6 @@
 using CycleSync.Api.Auth;
 using CycleSync.Api.Features.Users;
+using CycleSync.Api.Http;
 using CycleSync.Domain.Users;
 using CycleSync.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,7 @@ public static class ProfileEndpoints
         group.MapGet("/profile", async (ICurrentUser current, CycleSyncDbContext db, CancellationToken cancellationToken) =>
         {
             var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == current.Id, cancellationToken);
-            return user is null ? Results.NotFound() : Results.Ok(user.ToProfile());
+            return user is null ? Problems.NotFound() : Results.Ok(user.ToProfile());
         });
 
         group.MapPut("/profile", async (
@@ -28,7 +29,7 @@ public static class ProfileEndpoints
             var user = await db.Users.FirstOrDefaultAsync(u => u.Id == current.Id, cancellationToken);
             if (user is null)
             {
-                return Results.NotFound();
+                return Problems.NotFound();
             }
 
             var home = string.IsNullOrWhiteSpace(request.HomeLocation) ? null : new GeoPlace(request.HomeLocation.Trim());
@@ -42,7 +43,7 @@ public static class ProfileEndpoints
         {
             var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == current.Id, cancellationToken);
             return user is null
-                ? Results.NotFound()
+                ? Problems.NotFound()
                 : Results.Ok(user.Passports.Select(p => p.Country).ToArray());
         });
 
@@ -55,14 +56,13 @@ public static class ProfileEndpoints
         {
             if (string.IsNullOrWhiteSpace(request.Country))
             {
-                return Results.Problem(statusCode: StatusCodes.Status400BadRequest,
-                    title: "Invalid passport", detail: "country is required", type: "validation");
+                return Problems.Validation("country is required");
             }
 
             var user = await db.Users.FirstOrDefaultAsync(u => u.Id == current.Id, cancellationToken);
             if (user is null)
             {
-                return Results.NotFound();
+                return Problems.NotFound();
             }
 
             user.AddPassport(request.Country, clock);
@@ -81,7 +81,7 @@ public static class ProfileEndpoints
             var user = await db.Users.FirstOrDefaultAsync(u => u.Id == current.Id, cancellationToken);
             if (user is null)
             {
-                return Results.NotFound();
+                return Problems.NotFound();
             }
 
             user.RemovePassport(Uri.UnescapeDataString(country), clock);

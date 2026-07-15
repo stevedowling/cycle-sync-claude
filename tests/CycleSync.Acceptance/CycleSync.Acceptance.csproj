@@ -40,6 +40,7 @@
     <ReqnrollFeatureFile Include="..\features\off-cycle-planning.feature" Link="Features\off-cycle-planning.feature" />
     <ReqnrollFeatureFile Include="..\features\attendance-status.feature" Link="Features\attendance-status.feature" />
     <ReqnrollFeatureFile Include="..\features\cost-estimation.feature" Link="Features\cost-estimation.feature" />
+    <ReqnrollFeatureFile Include="..\features\error-taxonomy.feature" Link="Features\error-taxonomy.feature" />
   </ItemGroup>
 
   <ItemGroup>

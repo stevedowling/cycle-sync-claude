@@ -13,6 +13,7 @@ public sealed class FakeMapsSearch : IMapsSearch
     [
         new("Lisbon, Portugal", "Portugal", 38.7223, -9.1393, "PT/Lisbon"),
         new("Auckland, New Zealand", "New Zealand", -36.8485, 174.7633, "NZ/Auckland"),
+        new("London, United Kingdom", "United Kingdom", 51.5072, -0.1276, "GB/London"),
         new("Barcelona, Spain", "Spain", 41.3874, 2.1686, "ES/Barcelona"),
         new("Singapore", "Singapore", 1.3521, 103.8198, "SG/Singapore"),
     ];

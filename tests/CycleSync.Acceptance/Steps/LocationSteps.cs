@@ -8,8 +8,6 @@ namespace CycleSync.Acceptance.Steps;
 [Binding]
 public sealed class LocationSteps(ScenarioWorld world)
 {
-    private string? _lastPersistedName;
-
     [Given("Azure Maps returns results for {string}")]
     public void GivenAzureMapsReturnsResultsFor(string query)
     {
@@ -57,21 +55,6 @@ public sealed class LocationSteps(ScenarioWorld world)
     public async Task ThenPersistentLocationExists(string name) =>
         Assert.NotEmpty(await LocationsNamedAsync(name));
 
-    [Then("it is visible to all users")]
-    public async Task ThenItIsVisibleToAllUsers()
-    {
-        var name = _lastPersistedName!;
-        var viewer = world.CurrentEmail;
-
-        await world.SignInAsync("colleague@cyclesync.example");
-        Assert.NotEmpty(await LocationsNamedAsync(name));
-
-        if (viewer is not null)
-        {
-            world.SetCurrent(viewer);
-        }
-    }
-
     [Then("there is exactly one location {string}")]
     public async Task ThenExactlyOneLocation(string name) =>
         Assert.Single(await LocationsNamedAsync(name));
@@ -112,7 +95,7 @@ public sealed class LocationSteps(ScenarioWorld world)
             ? idElement.GetString()
             : null;
 
-        _lastPersistedName = NameOf(searchResult);
+        world.LastCreated = ("location", NameOf(searchResult)!);
 
         await world.PostJsonAsync("/api/locations", new
         {

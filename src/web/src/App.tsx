@@ -1,9 +1,10 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Link, Navigate, Route, Routes } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import { loggedOut } from './features/auth/authSlice';
 import { SignIn } from './features/auth/SignIn';
 import { LocationsPage } from './features/locations/LocationsPage';
 import { LocationDetailPage } from './features/locations/LocationDetailPage';
+import { OffCyclesPage } from './features/offcycles/OffCyclesPage';
 import './App.css';
 
 function App() {
@@ -32,16 +33,23 @@ function App() {
         {!isAuthenticated ? (
           <SignIn />
         ) : (
-          <Routes>
-            <Route path="/" element={<LocationsPage />} />
-            <Route path="/locations/:id" element={<LocationDetailPage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <>
+            <nav className="app-nav" data-testid="app-nav">
+              <Link to="/">Destinations</Link>
+              <Link to="/off-cycles">Off-cycles</Link>
+            </nav>
+            <Routes>
+              <Route path="/" element={<LocationsPage />} />
+              <Route path="/locations/:id" element={<LocationDetailPage />} />
+              <Route path="/off-cycles" element={<OffCyclesPage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </>
         )}
       </main>
 
       <footer className="app-footer">
-        <span>CycleSync · Phase 2 — locations &amp; discovery</span>
+        <span>CycleSync · Phase 4 — off-cycles &amp; attendance</span>
       </footer>
     </div>
   );

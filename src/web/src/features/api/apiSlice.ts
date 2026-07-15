@@ -1,9 +1,13 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../../app/store';
 import type {
+  AttendanceSummary,
+  CostEstimate,
+  CreateOffCycleRequest,
   LocationIntelligence,
   LocationResponse,
   LocationSearchResult,
+  OffCycleResponse,
   SignInResponse,
 } from '../../app/types';
 
@@ -21,7 +25,7 @@ export const apiSlice = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Locations'],
+  tagTypes: ['Locations', 'OffCycles', 'Attendance'],
   endpoints: (builder) => ({
     signIn: builder.mutation<SignInResponse, { idToken: string }>({
       query: (body) => ({ url: '/auth/google', method: 'POST', body }),
@@ -50,6 +54,29 @@ export const apiSlice = createApi({
     getIntelligence: builder.query<LocationIntelligence, string>({
       query: (id) => `/locations/${id}/intelligence`,
     }),
+    getOffCycles: builder.query<OffCycleResponse[], void>({
+      query: () => '/off-cycles',
+      providesTags: ['OffCycles'],
+    }),
+    createOffCycle: builder.mutation<OffCycleResponse, CreateOffCycleRequest>({
+      query: (body) => ({ url: '/off-cycles', method: 'POST', body }),
+      invalidatesTags: ['OffCycles'],
+    }),
+    getAttendance: builder.query<AttendanceSummary, string>({
+      query: (id) => `/off-cycles/${id}/attendance`,
+      providesTags: (_result, _error, id) => [{ type: 'Attendance', id }],
+    }),
+    setAttendance: builder.mutation<void, { id: string; status: string }>({
+      query: ({ id, status }) => ({
+        url: `/off-cycles/${id}/attendance`,
+        method: 'PUT',
+        body: { status },
+      }),
+      invalidatesTags: (_result, _error, { id }) => [{ type: 'Attendance', id }],
+    }),
+    getOffCycleCostEstimate: builder.query<CostEstimate, string>({
+      query: (id) => `/off-cycles/${id}/cost-estimate`,
+    }),
   }),
 });
 
@@ -59,4 +86,9 @@ export const {
   useLazySearchLocationsQuery,
   usePersistLocationMutation,
   useGetIntelligenceQuery,
+  useGetOffCyclesQuery,
+  useCreateOffCycleMutation,
+  useGetAttendanceQuery,
+  useSetAttendanceMutation,
+  useGetOffCycleCostEstimateQuery,
 } = apiSlice;

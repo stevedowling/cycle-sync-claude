@@ -24,6 +24,7 @@ implement until it passes.
 | [docs/08-phase-0-walking-skeleton.md](docs/08-phase-0-walking-skeleton.md) | Phase 0 (built): what exists, how to run, limitations |
 | [docs/09-phase-1-auth-profiles.md](docs/09-phase-1-auth-profiles.md) | Phase 1 (built): auth, profiles, persistence, testing approach |
 | [docs/10-phase-2-locations-discovery.md](docs/10-phase-2-locations-discovery.md) | Phase 2 (built): location search, persistence, AI intelligence |
+| [docs/11-phase-4-offcycles-attendance.md](docs/11-phase-4-offcycles-attendance.md) | Phase 4 (built): off-cycles, attendance, cost estimation |
 | [tests/features/](tests/features/) | Executable Gherkin feature files (the BDD specs) |
 
 ## Guiding principles (from the brief)
@@ -95,10 +96,13 @@ are green in CI and the slice is reachable in the running Aspire app.
 - Mark/unmark interest; interest counts; sort by consensus.
 - **Features:** `interest-tracking.feature`
 
-### Phase 4 — Off-cycles & attendance
-- Create/manage off-cycle events (location + dates).
-- Per-user attendance status state machine.
-- Recalculated, date-specific cost estimates.
+### Phase 4 — Off-cycles & attendance ✅ built
+- Create/manage off-cycle events (location + dates); `EndDate >= StartDate` enforced; creator seeded `Interested`.
+- Per-user attendance status (five values, unrestricted transitions); per-off-cycle roster + counts.
+- Heuristic, date-specific cost estimates (distance-based flights, per-night accommodation/expenses),
+  recomputed per request and reflecting the traveller's home location; confidence + timestamp disclosed.
+- React off-cycles screen wired via RTK Query (plan, list, set attendance).
+- Reqnroll suite green (36/36). **Details:** [docs/11-phase-4-offcycles-attendance.md](docs/11-phase-4-offcycles-attendance.md)
 - **Features:** `off-cycle-planning.feature`, `attendance-status.feature`, `cost-estimation.feature`
 
 ### Phase 5 — Hardening

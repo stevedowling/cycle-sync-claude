@@ -38,3 +38,45 @@ export interface LocationIntelligence {
   confidence: string;
   generatedAt: string;
 }
+
+export interface OffCycleResponse {
+  id: string;
+  name: string;
+  locationId: string;
+  locationName: string;
+  startDate: string;
+  endDate: string;
+  nights: number;
+  createdByUserId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateOffCycleRequest {
+  name: string;
+  locationId: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface AttendanceRosterEntry {
+  userId: string;
+  displayName: string;
+  status: string;
+}
+
+export interface AttendanceSummary {
+  offCycleId: string;
+  counts: Record<string, number>;
+  roster: AttendanceRosterEntry[];
+}
+
+export interface CostEstimate {
+  currency: string;
+  flights: number;
+  accommodation: number;
+  dailyExpenses: number;
+  nights: number;
+  confidence: string;
+  generatedAt: string;
+}
